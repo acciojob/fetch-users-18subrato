@@ -1,29 +1,21 @@
-// src/UserList.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import './UserList.css'; // optional styling
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [hasFetched, setHasFetched] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
-    setErrorMsg('');
     try {
       const response = await axios.get('https://reqres.in/api/users');
-      const data = response.data.data;
-      if (data.length > 0) {
-        setUsers(data);
-      } else {
-        setUsers([]);
-        setErrorMsg('No users found.');
-      }
+      setUsers(response.data.data || []);
     } catch (error) {
-      setErrorMsg('Failed to fetch users.');
+      setUsers([]);
     } finally {
       setLoading(false);
+      setHasFetched(true);
     }
   };
 
@@ -33,8 +25,11 @@ const UserList = () => {
       <button className="btn" onClick={fetchUsers}>Get User List</button>
 
       {loading && <p>Loading...</p>}
-      {errorMsg && <p>{errorMsg}</p>}
 
+      {!loading && hasFetched && users.length === 0 && (
+        <p className="no-data">No data found</p>
+      )}
+        {users.length == 0  && <p>No data found</p>}
       {!loading && users.length > 0 && (
         <table>
           <thead>
